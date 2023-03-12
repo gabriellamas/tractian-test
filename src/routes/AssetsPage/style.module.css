@@ -1,0 +1,26 @@
+.ColAssetInfo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+  margin-top: 24px;
+  background: #f0f0f0;
+  border-radius: 8px;
+}
+.AssetImage {
+  object-fit: cover;
+  width: 200px;
+  height: 200px;
+}
+
+.BodyInfoAsset {
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  flex: 1;
+  gap: 32px;
+}
+
+strong {
+  margin-bottom: 8px;
+}
