@@ -7,7 +7,7 @@ export interface Responsibles {
   email: string;
 }
 
-export const fetchAssignedUserIds = (users: AssignedUserIds) => {
+export const fetchAssignedUserById = (users: AssignedUserIds) => {
   try {
     const response = axios
       .all(

@@ -1,4 +1,4 @@
-import { Layout, Menu, Breadcrumb, theme } from "antd";
+import { Layout, Menu, Breadcrumb, theme, Col } from "antd";
 
 import TractianLogo from "../../assets/tractian-logo.svg";
 
@@ -7,18 +7,25 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { chart1 } from "./optionsChart";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { fetchAssets } from "../../utils/fetchAssets";
+import { loadingContext } from "../../context/LoadingContext";
+import { Assets } from "../AssetsPage";
+import { ChartData, optionsChart } from "./optionsChart";
+import { LoadingSVG } from "../../components/LoadingSVG";
 
 const menuOptions = [
   { name: "Gráficos", route: "/" },
+  { name: "Ordens de serviço", route: "/ordens" },
   { name: "Ativos", route: "/ativos" },
   { name: "Usuários", route: "/usuarios" },
   { name: "Unidades", route: "/unidades" },
-  { name: "Empresas", route: "/empresas" },
-  { name: "Ordens de serviço", route: "/ordens" },
+  { name: "Empresa", route: "/empresa" },
 ];
 
 const Home = () => {
+  const { loading, setLoading } = useContext(loadingContext);
+  const [dataForChart, setDataForChart] = useState<ChartData>();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -26,6 +33,30 @@ const Home = () => {
   const location = useLocation();
 
   const navigate = useNavigate();
+
+  const handleFetchAssets = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data: Assets[] = await fetchAssets();
+
+      const dataForChart = data.map((asset) => ({
+        name: asset.name,
+        y: asset.healthscore,
+        drilldown: asset.name,
+      }));
+
+      const dataHighchartFormated = optionsChart(dataForChart);
+      setDataForChart(dataHighchartFormated);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    handleFetchAssets();
+  }, []);
+
   return (
     <>
       <Layout>
@@ -80,8 +111,17 @@ const Home = () => {
               background: colorBgContainer,
             }}
           >
+            {loading && <LoadingSVG />}
             {location.pathname === "/" ? (
-              <HighchartsReact highcharts={Highcharts} options={chart1} />
+              <>
+                <Col style={{ marginBottom: "24px" }}>
+                  <h1>Gráficos</h1>
+                </Col>
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={dataForChart}
+                />
+              </>
             ) : (
               <Outlet />
             )}

@@ -3,15 +3,14 @@ import { AssetImage } from "../../components/AssetImage";
 import { Col, Empty, Button, Modal, Timeline, Typography } from "antd";
 import { useCallback, useContext, useEffect, useState } from "react";
 
-import axios from "axios";
-
 import styles from "./style.module.css";
 import {
-  fetchAssignedUserIds,
+  fetchAssignedUserById,
   Responsibles,
-} from "../../utils/fetchAssignedUserIds";
+} from "../../utils/fetchAssignedUserById";
 import { dateFormat } from "../../utils/dateFormat";
 import { loadingContext } from "../../context/LoadingContext";
+import { fetchAssets } from "../../utils/fetchAssets";
 
 interface HealthStatusTimeStamp {
   status: string;
@@ -26,7 +25,7 @@ interface itemsHistory {
   children: JSX.Element;
 }
 
-interface Assets {
+export interface Assets {
   assignedUserIds: number[];
   companyId: number;
   healthHistory: HealthStatusTimeStamp[];
@@ -87,7 +86,7 @@ export const AssetsPage = () => {
 
   const handleShowModalResposibles = async (index: number) => {
     setLoading(true);
-    const responsibles = await fetchAssignedUserIds(
+    const responsibles = await fetchAssignedUserById(
       assets[index].assignedUserIds
     );
     setResponsiblesSelected(responsibles);
@@ -104,25 +103,19 @@ export const AssetsPage = () => {
     }
   };
 
-  const fetchInfos = useCallback(async () => {
+  const handleFetchAssets = useCallback(async () => {
+    setLoading(true);
     try {
-      const { data } = await axios.get(
-        "https://my-json-server.typicode.com/tractian/fake-api/assets"
-      );
+      const data = await fetchAssets();
       setAssets(data);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.message);
-      } else {
-        throw new Error(`${error}`);
-      }
-    } finally {
-      setLoading(false);
+      console.log(error);
     }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchInfos();
+    handleFetchAssets();
   }, []);
 
   return (
@@ -233,7 +226,7 @@ export const AssetsPage = () => {
       >
         <div style={{ marginTop: "32px" }}>
           {responsiblesSelected.map((responsible) => (
-            <div key={responsible.name} style={{ marginBottom: "32px" }}>
+            <div key={responsible.name} style={{ marginBottom: "16px" }}>
               <Text>{responsible.name}</Text> <Text>{responsible.email}</Text>
             </div>
           ))}

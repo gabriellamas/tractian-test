@@ -1,4 +1,4 @@
-import { Space, Table, Tag } from "antd";
+import { Button, Col, Modal, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axios from "axios";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -13,15 +13,20 @@ interface User {
   unitId: number;
 }
 
+interface Company {
+  id: number;
+  name: string;
+}
+
 const UsersPage = () => {
   const { loading, setLoading } = useContext(loadingContext);
-  const [users, setUsers] = useState<User[]>([]);
+  const [dataTable, setDataTable] = useState<DataType[]>([]);
 
   interface DataType {
     key: string;
     name: string;
     email: string;
-    companyId: number;
+    company: Company;
   }
 
   const columns: ColumnsType<DataType> = [
@@ -36,25 +41,49 @@ const UsersPage = () => {
       key: "email",
     },
     {
-      title: "Company ID",
-      dataIndex: "companyId",
-      key: "companyId",
+      title: "Company",
+      dataIndex: "company",
+      key: "company",
     },
   ];
 
-  const dataTable: DataType[] = users.map((user) => ({
-    key: `${user.id}`,
-    name: user.name,
-    email: user.email,
-    companyId: user.companyId,
-  }));
+  const companiesInfoFromUsers = useCallback(async (data: User[]) => {
+    try {
+      const companiesInfo = await axios.all(
+        data.map(({ companyId }) =>
+          axios.get(
+            `https://my-json-server.typicode.com/tractian/fake-api/companies/${companyId}`
+          )
+        )
+      );
+
+      return companiesInfo.map((response) => response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message);
+      } else {
+        throw new Error(`${error}`);
+      }
+    }
+  }, []);
 
   const fetchInfos = useCallback(async () => {
+    setLoading(true);
     try {
-      const { data } = await axios.get(
+      const usersInfo = await axios.get(
         "https://my-json-server.typicode.com/tractian/fake-api/users"
       );
-      setUsers(data);
+      const companiesInfo = await companiesInfoFromUsers(usersInfo.data);
+
+      const dataTable = usersInfo.data.map((user: User) => ({
+        key: user.name,
+        name: user.name,
+        email: user.email,
+        company: companiesInfo.find((company) => company.id === user.companyId)
+          .name,
+      }));
+
+      setDataTable(dataTable);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message);
@@ -70,11 +99,17 @@ const UsersPage = () => {
     fetchInfos();
   }, []);
 
-  if (loading) return <LoadingSVG />;
   return (
     <>
-      <h1>Usuarios Page</h1>
-      <Table dataSource={dataTable} columns={columns} />
+      {loading && <LoadingSVG />}
+      <Col style={{ marginBottom: "24px" }}>
+        <h1>Usuários</h1>
+      </Col>
+      <Table
+        dataSource={dataTable}
+        columns={columns}
+        style={{ border: "1px solid rgba(0,0,0,0.1)", borderRadius: "8px" }}
+      />
     </>
   );
 };

@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const LoadingContextProvider = ({ children }: Props) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   return (
     <loadingContext.Provider

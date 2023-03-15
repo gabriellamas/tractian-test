@@ -11,7 +11,7 @@ export const LoadingSVG = () => {
         top: "0px",
         left: "0px",
         zIndex: "100",
-        background: "rgba(0,0,0,0.8)",
+        background: "rgba(0,0,0,0.5)",
       }}
     >
       <svg
