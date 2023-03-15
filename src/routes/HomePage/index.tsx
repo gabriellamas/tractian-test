@@ -24,7 +24,7 @@ const menuOptions = [
 ];
 
 const Home = () => {
-  const { loading, setLoading } = useContext(loadingContext);
+  const { messageApi } = useContext(loadingContext);
   const [dataForChart, setDataForChart] = useState<ChartData>();
   const {
     token: { colorBgContainer },
@@ -35,8 +35,12 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleFetchAssets = useCallback(async () => {
-    setLoading(true);
     try {
+      messageApi.open({
+        type: "loading",
+        content: "Bringing data..",
+        duration: 0,
+      });
       const data: Assets[] = await fetchAssets();
 
       const dataForChart = data.map((asset) => ({
@@ -49,8 +53,9 @@ const Home = () => {
       setDataForChart(dataHighchartFormated);
     } catch (error) {
       console.log(error);
+    } finally {
+      messageApi.destroy();
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -111,7 +116,6 @@ const Home = () => {
               background: colorBgContainer,
             }}
           >
-            {loading && <LoadingSVG />}
             {location.pathname === "/" ? (
               <>
                 <Col style={{ marginBottom: "24px" }}>

@@ -2,7 +2,6 @@ import axios from "axios";
 import { Col, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { LoadingSVG } from "../../components/LoadingSVG";
 import { loadingContext } from "../../context/LoadingContext";
 
 interface Order {
@@ -30,8 +29,8 @@ interface Order {
 }
 
 const OrdersPage = () => {
-  const { loading, setLoading } = useContext(loadingContext);
   const [orders, setOrders] = useState<Order[]>([]);
+  const { messageApi } = useContext(loadingContext);
 
   interface DataType {
     priority: string;
@@ -67,8 +66,12 @@ const OrdersPage = () => {
   }));
 
   const fetchInfos = useCallback(async () => {
-    setLoading(true);
     try {
+      messageApi.open({
+        type: "loading",
+        content: "Bringing data..",
+        duration: 0,
+      });
       const { data } = await axios.get(
         "https://my-json-server.typicode.com/tractian/fake-api/workorders"
       );
@@ -80,7 +83,7 @@ const OrdersPage = () => {
         throw new Error(`${error}`);
       }
     } finally {
-      setLoading(false);
+      messageApi.destroy();
     }
   }, []);
 
@@ -88,7 +91,6 @@ const OrdersPage = () => {
     fetchInfos();
   }, []);
 
-  if (loading) return <LoadingSVG />;
   return (
     <>
       <Col style={{ marginBottom: "24px" }}>

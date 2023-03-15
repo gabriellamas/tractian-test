@@ -12,7 +12,7 @@ interface Companie {
 }
 
 const CompaniesPage = () => {
-  const { loading, setLoading } = useContext(loadingContext);
+  const { messageApi } = useContext(loadingContext);
   const [companies, setCompanies] = useState<Companie[]>([]);
 
   interface DataType {
@@ -37,8 +37,12 @@ const CompaniesPage = () => {
   }));
 
   const fetchInfos = useCallback(async () => {
-    setLoading(true);
     try {
+      messageApi.open({
+        type: "loading",
+        content: "Bringing data..",
+        duration: 0,
+      });
       const { data } = await axios.get(
         "https://my-json-server.typicode.com/tractian/fake-api/companies"
       );
@@ -50,7 +54,7 @@ const CompaniesPage = () => {
         throw new Error(`${error}`);
       }
     } finally {
-      setLoading(false);
+      messageApi.destroy();
     }
   }, []);
 
@@ -58,7 +62,6 @@ const CompaniesPage = () => {
     fetchInfos();
   }, []);
 
-  if (loading) return <LoadingSVG />;
   return (
     <>
       <Col style={{ marginBottom: "24px" }}>

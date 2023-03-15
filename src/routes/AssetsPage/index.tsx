@@ -57,10 +57,9 @@ const Status: Status = {
 };
 
 export const AssetsPage = () => {
-  const { loading, setLoading } = useContext(loadingContext);
-
   const { Text } = Typography;
   const [assets, setAssets] = useState<Assets[]>([]);
+  const { messageApi } = useContext(loadingContext);
 
   const [isModalOpenHistory, setIsModalOpenHistory] = useState(false);
   const [historySelected, setHistorySelected] = useState<itemsHistory[]>([]);
@@ -85,13 +84,17 @@ export const AssetsPage = () => {
   };
 
   const handleShowModalResposibles = async (index: number) => {
-    setLoading(true);
+    messageApi.open({
+      type: "loading",
+      content: "Bringing data..",
+      duration: 0,
+    });
     const responsibles = await fetchAssignedUserById(
       assets[index].assignedUserIds
     );
     setResponsiblesSelected(responsibles);
     setIsModalOpenResponsible(true);
-    setLoading(false);
+    messageApi.destroy();
   };
 
   const handleOkorCancel = (name: string) => {
@@ -104,14 +107,19 @@ export const AssetsPage = () => {
   };
 
   const handleFetchAssets = useCallback(async () => {
-    setLoading(true);
     try {
+      messageApi.open({
+        type: "loading",
+        content: "Bringing data..",
+        duration: 0,
+      });
       const data = await fetchAssets();
       setAssets(data);
     } catch (error) {
       console.log(error);
+    } finally {
+      messageApi.destroy();
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -120,7 +128,6 @@ export const AssetsPage = () => {
 
   return (
     <>
-      {loading && <LoadingSVG />}
       <Col>
         <h1>Ativos</h1>
       </Col>

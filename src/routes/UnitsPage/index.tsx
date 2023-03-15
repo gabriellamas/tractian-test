@@ -1,8 +1,7 @@
-import { Col, Table } from "antd";
+import { Col, message, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axios from "axios";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { LoadingSVG } from "../../components/LoadingSVG";
 import { loadingContext } from "../../context/LoadingContext";
 
 interface Unit {
@@ -12,9 +11,8 @@ interface Unit {
 }
 
 const UnitsPage = () => {
-  const { loading, setLoading } = useContext(loadingContext);
-  const [units, setUnits] = useState<Unit[]>([]);
-
+  const { messageApi } = useContext(loadingContext);
+  const [dataTable, setDataTable] = useState<DataType[]>([]);
   interface DataType {
     name: string;
     company: number;
@@ -31,18 +29,21 @@ const UnitsPage = () => {
     },
   ];
 
-  const dataTable: DataType[] = units.map((unit) => ({
-    name: unit.name,
-    company: unit.companyId,
-  }));
-
-  const fetchInfos = useCallback(async () => {
-    setLoading(true);
+  const companiesInfoFromUnits = useCallback(async (data: Unit[]) => {
     try {
-      const { data } = await axios.get(
-        "https://my-json-server.typicode.com/tractian/fake-api/units"
+      messageApi.open({
+        type: "loading",
+        content: "Bringing data..",
+        duration: 0,
+      });
+      const companiesInfo = await axios.all(
+        data.map(({ companyId }) =>
+          axios.get(
+            `https://my-json-server.typicode.com/tractian/fake-api/companies/${companyId}`
+          )
+        )
       );
-      setUnits(data);
+      return companiesInfo.map((response) => response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message);
@@ -50,7 +51,32 @@ const UnitsPage = () => {
         throw new Error(`${error}`);
       }
     } finally {
-      setLoading(false);
+      messageApi.destroy();
+    }
+  }, []);
+
+  const fetchInfos = useCallback(async () => {
+    try {
+      const unitsInfo = await axios.get(
+        "https://my-json-server.typicode.com/tractian/fake-api/units"
+      );
+      const companiesInfo = await companiesInfoFromUnits(unitsInfo.data);
+
+      const dataTable = unitsInfo.data.map((unit: Unit) => ({
+        key: unit.name,
+        name: unit.name,
+        company: companiesInfo.find((company) => company.id === unit.companyId)
+          .name,
+      }));
+
+      setDataTable(dataTable);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message);
+      } else {
+        throw new Error(`${error}`);
+      }
+    } finally {
     }
   }, []);
 
@@ -58,7 +84,6 @@ const UnitsPage = () => {
     fetchInfos();
   }, []);
 
-  if (loading) return <LoadingSVG />;
   return (
     <>
       <Col style={{ marginBottom: "24px" }}>

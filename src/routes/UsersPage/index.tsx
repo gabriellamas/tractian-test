@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Table } from "antd";
+import { Col, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axios from "axios";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -19,7 +19,7 @@ interface Company {
 }
 
 const UsersPage = () => {
-  const { loading, setLoading } = useContext(loadingContext);
+  const { messageApi } = useContext(loadingContext);
   const [dataTable, setDataTable] = useState<DataType[]>([]);
 
   interface DataType {
@@ -68,8 +68,12 @@ const UsersPage = () => {
   }, []);
 
   const fetchInfos = useCallback(async () => {
-    setLoading(true);
     try {
+      messageApi.open({
+        type: "loading",
+        content: "Bringing data..",
+        duration: 0,
+      });
       const usersInfo = await axios.get(
         "https://my-json-server.typicode.com/tractian/fake-api/users"
       );
@@ -91,7 +95,7 @@ const UsersPage = () => {
         throw new Error(`${error}`);
       }
     } finally {
-      setLoading(false);
+      messageApi.destroy();
     }
   }, []);
 
@@ -101,7 +105,6 @@ const UsersPage = () => {
 
   return (
     <>
-      {loading && <LoadingSVG />}
       <Col style={{ marginBottom: "24px" }}>
         <h1>Usuários</h1>
       </Col>
