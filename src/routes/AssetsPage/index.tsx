@@ -116,7 +116,7 @@ export const AssetsPage = () => {
       const dataWithSort = orderAssets(data);
       setAssets(dataWithSort);
     } catch (error) {
-      messageApi.open({
+      await messageApi.open({
         type: "error",
         content: `${error}`,
       });

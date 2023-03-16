@@ -89,12 +89,12 @@ const UsersPage = () => {
       setDataTable(dataTable);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        messageApi.open({
+        await messageApi.open({
           type: "error",
           content: `Error: ${error.message}. Tente novamente mais tarde..`,
         });
       } else {
-        messageApi.open({
+        await messageApi.open({
           type: "error",
           content: `Error: ${error}. Tente novamente mais tarde..`,
         });

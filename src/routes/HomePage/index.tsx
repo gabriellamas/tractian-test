@@ -51,7 +51,7 @@ const Home = () => {
       const dataHighchartFormated = optionsChart(dataForChart);
       setDataForChart(dataHighchartFormated);
     } catch (error) {
-      messageApi.open({
+      await messageApi.open({
         type: "error",
         content: `Error: ${error}. Tente novamente mais tarde..`,
       });
