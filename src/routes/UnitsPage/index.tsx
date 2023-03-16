@@ -46,9 +46,15 @@ const UnitsPage = () => {
       return companiesInfo.map((response) => response.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message);
+        messageApi.open({
+          type: "error",
+          content: `Error: ${error.message}. Try again later.`,
+        });
       } else {
-        throw new Error(`${error}`);
+        messageApi.open({
+          type: "error",
+          content: `Error: ${error}. Try again later.`,
+        });
       }
     } finally {
       messageApi.destroy();
@@ -57,6 +63,11 @@ const UnitsPage = () => {
 
   const fetchInfos = useCallback(async () => {
     try {
+      messageApi.open({
+        type: "loading",
+        content: "Bringing data..",
+        duration: 0,
+      });
       const unitsInfo = await axios.get(
         "https://my-json-server.typicode.com/tractian/fake-api/units"
       );
@@ -65,18 +76,25 @@ const UnitsPage = () => {
       const dataTable = unitsInfo.data.map((unit: Unit) => ({
         key: unit.name,
         name: unit.name,
-        company: companiesInfo.find((company) => company.id === unit.companyId)
+        company: companiesInfo?.find((company) => company.id === unit.companyId)
           .name,
       }));
 
       setDataTable(dataTable);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message);
+        await messageApi.open({
+          type: "error",
+          content: `Error: ${error.message}. Try again later.`,
+        });
       } else {
-        throw new Error(`${error}`);
+        await messageApi.open({
+          type: "error",
+          content: `Error: ${error}. Try again later.`,
+        });
       }
     } finally {
+      messageApi.destroy();
     }
   }, []);
 

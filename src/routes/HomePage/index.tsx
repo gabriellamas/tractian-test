@@ -52,7 +52,10 @@ const Home = () => {
       const dataHighchartFormated = optionsChart(dataForChart);
       setDataForChart(dataHighchartFormated);
     } catch (error) {
-      console.log(error);
+      messageApi.open({
+        type: "error",
+        content: `Error: ${error}. Try again later.`,
+      });
     } finally {
       messageApi.destroy();
     }

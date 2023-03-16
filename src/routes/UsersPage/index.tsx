@@ -90,9 +90,15 @@ const UsersPage = () => {
       setDataTable(dataTable);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message);
+        messageApi.open({
+          type: "error",
+          content: `Error: ${error.message}. Try again later.`,
+        });
       } else {
-        throw new Error(`${error}`);
+        messageApi.open({
+          type: "error",
+          content: `Error: ${error}. Try again later.`,
+        });
       }
     } finally {
       messageApi.destroy();

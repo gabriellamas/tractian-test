@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Col, Table } from "antd";
+import { Col, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { loadingContext } from "../../context/LoadingContext";
@@ -24,7 +24,7 @@ interface Order {
   description: string;
   id: number;
   priority: "high" | "Low";
-  status: "completed" | "pending";
+  status: "completed" | "in progress";
   title: string;
 }
 
@@ -43,10 +43,20 @@ const OrdersPage = () => {
     {
       title: "Prioridade",
       dataIndex: "priority",
+      render: (_, { priority }) => (
+        <Tag color={priority === "high" ? "red" : "gold"} key={priority}>
+          {priority.toUpperCase()}
+        </Tag>
+      ),
     },
     {
       title: "Status",
       dataIndex: "status",
+      render: (_, { status }) => (
+        <Tag color={status === "completed" ? "green" : "gold"} key={status}>
+          {status.toUpperCase()}
+        </Tag>
+      ),
     },
     {
       title: "Título",
@@ -78,9 +88,15 @@ const OrdersPage = () => {
       setOrders(data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message);
+        messageApi.open({
+          type: "error",
+          content: `Error: ${error.message}. Try again later.`,
+        });
       } else {
-        throw new Error(`${error}`);
+        messageApi.open({
+          type: "error",
+          content: `Error: ${error}. Try again later.`,
+        });
       }
     } finally {
       messageApi.destroy();

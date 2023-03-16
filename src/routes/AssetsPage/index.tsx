@@ -1,7 +1,13 @@
 import { LoadingSVG } from "../../components/LoadingSVG";
 import { AssetImage } from "../../components/AssetImage";
-import { Col, Empty, Button, Modal, Timeline, Typography } from "antd";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { Col, Empty, Button, Modal, Timeline, Typography, Tag } from "antd";
+import React, {
+  ReactElement,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import styles from "./style.module.css";
 import {
@@ -15,10 +21,6 @@ import { fetchAssets } from "../../utils/fetchAssets";
 interface HealthStatusTimeStamp {
   status: string;
   timestamp: string;
-}
-
-interface Status {
-  [key: string]: string;
 }
 
 interface itemsHistory {
@@ -49,11 +51,14 @@ export interface Assets {
   unitId: number;
 }
 
+interface Status {
+  [key: string]: { text: string; color: string };
+}
 const Status: Status = {
-  inAlert: "Em Alerta",
-  inOperation: "Em Operação",
-  inDowntime: "Em Parada",
-  unplannedStop: "Parada inesperada",
+  inAlert: { text: "Em Alerta", color: "red" },
+  inOperation: { text: "Em Operação", color: "green" },
+  inDowntime: { text: "Em Parada", color: "gold" },
+  unplannedStop: { text: "Parada inesperada", color: "volcano" },
 };
 
 export const AssetsPage = () => {
@@ -73,7 +78,7 @@ export const AssetsPage = () => {
     const itemsHistory = assets[index].healthHistory.map((health) => ({
       children: (
         <>
-          <Text>{Status[health.status]}</Text>
+          <Text>{Status[health.status].text}</Text>
           <Text>{dateFormat(health.timestamp)}</Text>
         </>
       ),
@@ -116,7 +121,10 @@ export const AssetsPage = () => {
       const data = await fetchAssets();
       setAssets(data);
     } catch (error) {
-      console.log(error);
+      messageApi.open({
+        type: "error",
+        content: `${error}`,
+      });
     } finally {
       messageApi.destroy();
     }
@@ -145,7 +153,9 @@ export const AssetsPage = () => {
               <div className={styles.BodyInfoAsset}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <strong>Status</strong>
-                  <Text>{Status[asset.status]}</Text>
+                  <Tag color={Status[asset.status].color}>
+                    {Status[asset.status].text}
+                  </Tag>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <strong>Performance:</strong>
@@ -234,7 +244,8 @@ export const AssetsPage = () => {
         <div style={{ marginTop: "32px" }}>
           {responsiblesSelected.map((responsible) => (
             <div key={responsible.name} style={{ marginBottom: "16px" }}>
-              <Text>{responsible.name}</Text> <Text>{responsible.email}</Text>
+              <Text>{responsible.name}</Text> <br />
+              <Text>{responsible.email}</Text>
             </div>
           ))}
         </div>

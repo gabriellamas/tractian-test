@@ -1,6 +1,6 @@
 import { message } from "antd";
 import { MessageInstance } from "antd/es/message/interface";
-import { createContext, ReactNode, SetStateAction, useState } from "react";
+import { createContext, ReactNode } from "react";
 
 interface ContextType {
   messageApi: MessageInstance;
