@@ -12,7 +12,6 @@ import { fetchAssets } from "../../utils/fetchAssets";
 import { loadingContext } from "../../context/LoadingContext";
 import { Assets } from "../AssetsPage";
 import { ChartData, optionsChart } from "./optionsChart";
-import { LoadingSVG } from "../../components/LoadingSVG";
 
 const menuOptions = [
   { name: "Gráficos", route: "/" },
@@ -38,7 +37,7 @@ const Home = () => {
     try {
       messageApi.open({
         type: "loading",
-        content: "Bringing data..",
+        content: "Trazendo dados...",
         duration: 0,
       });
       const data: Assets[] = await fetchAssets();
@@ -54,7 +53,7 @@ const Home = () => {
     } catch (error) {
       messageApi.open({
         type: "error",
-        content: `Error: ${error}. Try again later.`,
+        content: `Error: ${error}. Tente novamente mais tarde..`,
       });
     } finally {
       messageApi.destroy();

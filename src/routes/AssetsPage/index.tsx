@@ -1,13 +1,6 @@
-import { LoadingSVG } from "../../components/LoadingSVG";
 import { AssetImage } from "../../components/AssetImage";
 import { Col, Empty, Button, Modal, Timeline, Typography, Tag } from "antd";
-import React, {
-  ReactElement,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 
 import styles from "./style.module.css";
 import {
@@ -55,10 +48,10 @@ interface Status {
   [key: string]: { text: string; color: string };
 }
 const Status: Status = {
-  inAlert: { text: "Em Alerta", color: "red" },
-  inOperation: { text: "Em Operação", color: "green" },
-  inDowntime: { text: "Em Parada", color: "gold" },
-  unplannedStop: { text: "Parada inesperada", color: "volcano" },
+  inAlert: { text: "EM ALERTA", color: "red" },
+  inOperation: { text: "EM OPERAÇÃO", color: "green" },
+  inDowntime: { text: "EM PARADA", color: "gold" },
+  unplannedStop: { text: "PARADA INESPERADA", color: "volcano" },
 };
 
 export const AssetsPage = () => {
@@ -91,7 +84,7 @@ export const AssetsPage = () => {
   const handleShowModalResposibles = async (index: number) => {
     messageApi.open({
       type: "loading",
-      content: "Bringing data..",
+      content: "Trazendo dados...",
       duration: 0,
     });
     const responsibles = await fetchAssignedUserById(
@@ -115,11 +108,14 @@ export const AssetsPage = () => {
     try {
       messageApi.open({
         type: "loading",
-        content: "Bringing data..",
+        content: "Trazendo dados...",
         duration: 0,
       });
       const data = await fetchAssets();
-      setAssets(data);
+      const dataWithSort = data.sort((asset: Assets) => {
+        if (asset.status === "inAlert") return -1;
+      });
+      setAssets(dataWithSort);
     } catch (error) {
       messageApi.open({
         type: "error",

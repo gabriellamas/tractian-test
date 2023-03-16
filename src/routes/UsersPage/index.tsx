@@ -2,7 +2,6 @@ import { Col, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axios from "axios";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { LoadingSVG } from "../../components/LoadingSVG";
 import { loadingContext } from "../../context/LoadingContext";
 
 interface User {
@@ -71,7 +70,7 @@ const UsersPage = () => {
     try {
       messageApi.open({
         type: "loading",
-        content: "Bringing data..",
+        content: "Trazendo dados...",
         duration: 0,
       });
       const usersInfo = await axios.get(
@@ -92,12 +91,12 @@ const UsersPage = () => {
       if (axios.isAxiosError(error)) {
         messageApi.open({
           type: "error",
-          content: `Error: ${error.message}. Try again later.`,
+          content: `Error: ${error.message}. Tente novamente mais tarde..`,
         });
       } else {
         messageApi.open({
           type: "error",
-          content: `Error: ${error}. Try again later.`,
+          content: `Error: ${error}. Tente novamente mais tarde..`,
         });
       }
     } finally {

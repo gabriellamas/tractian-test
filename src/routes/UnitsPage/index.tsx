@@ -3,6 +3,7 @@ import { ColumnsType } from "antd/es/table";
 import axios from "axios";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { loadingContext } from "../../context/LoadingContext";
+import { fetchAssignedUserById } from "../../utils/fetchAssignedUserById";
 
 interface Unit {
   companyId: number;
@@ -33,7 +34,7 @@ const UnitsPage = () => {
     try {
       messageApi.open({
         type: "loading",
-        content: "Bringing data..",
+        content: "Trazendo dados...",
         duration: 0,
       });
       const companiesInfo = await axios.all(
@@ -48,12 +49,12 @@ const UnitsPage = () => {
       if (axios.isAxiosError(error)) {
         messageApi.open({
           type: "error",
-          content: `Error: ${error.message}. Try again later.`,
+          content: `Error: ${error.message}. Tente novamente mais tarde..`,
         });
       } else {
         messageApi.open({
           type: "error",
-          content: `Error: ${error}. Try again later.`,
+          content: `Error: ${error}. Tente novamente mais tarde..`,
         });
       }
     } finally {
@@ -65,7 +66,7 @@ const UnitsPage = () => {
     try {
       messageApi.open({
         type: "loading",
-        content: "Bringing data..",
+        content: "Trazendo dados...",
         duration: 0,
       });
       const unitsInfo = await axios.get(
@@ -85,12 +86,12 @@ const UnitsPage = () => {
       if (axios.isAxiosError(error)) {
         await messageApi.open({
           type: "error",
-          content: `Error: ${error.message}. Try again later.`,
+          content: `Error: ${error.message}. Tente novamente mais tarde..`,
         });
       } else {
         await messageApi.open({
           type: "error",
-          content: `Error: ${error}. Try again later.`,
+          content: `Error: ${error}. Tente novamente mais tarde..`,
         });
       }
     } finally {
