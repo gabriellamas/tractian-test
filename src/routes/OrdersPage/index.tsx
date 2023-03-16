@@ -124,7 +124,9 @@ const OrdersPage = () => {
       status: order.status,
       responsible: () => handleShowModalResposibles(index),
     }))
-    .sort((order) => (order.priority === "high" ? -1 : 0));
+    .sort((order) =>
+      order.priority === "high" && order.status === "in progress" ? -1 : 0
+    );
 
   const fetchInfos = useCallback(async () => {
     try {

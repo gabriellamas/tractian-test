@@ -10,6 +10,7 @@ import {
 import { dateFormat } from "../../utils/dateFormat";
 import { loadingContext } from "../../context/LoadingContext";
 import { fetchAssets } from "../../utils/fetchAssets";
+import { orderAssets } from "../../utils/orderAssets";
 
 interface HealthStatusTimeStamp {
   status: string;
@@ -112,9 +113,7 @@ export const AssetsPage = () => {
         duration: 0,
       });
       const data = await fetchAssets();
-      const dataWithSort = data.sort((asset: Assets) => {
-        if (asset.status === "inAlert") return -1;
-      });
+      const dataWithSort = orderAssets(data);
       setAssets(dataWithSort);
     } catch (error) {
       messageApi.open({
